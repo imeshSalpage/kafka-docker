@@ -39,6 +39,14 @@ cd kafka-docker
     LOG4J_LOGGER_KAFKA_AUTHORIZER_LOGGER: DEBUG, authorizerAppender
   ```
 
+## Temporary Environment Setup
+
+If a `.tmp.env` file is provided, rename it to `.env` to ensure the environment variables are correctly loaded:
+
+```bash
+mv .tmp.env .env
+```
+
 ## Starting the Kafka Environment
 
 Use Docker Compose to start the Kafka environment:
