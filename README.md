@@ -1,97 +1,110 @@
-# Kafka Docker Setup and Introduction
+
+# Kafka Docker Setup
+
+This repository provides a Docker-based setup for Apache Kafka, enabling streamlined deployment and management of Kafka services.
 
 ## Prerequisites
 
-- **Docker**: Ensure Docker is installed on your system. You can download it from [Docker's official website](https://www.docker.com/get-started).
-- **Docker Compose**: This tool is necessary for managing multi-container Docker applications. Install it by following the instructions in the [Docker Compose installation guide](https://docs.docker.com/compose/install/).
+- **Docker**: Ensure that [Docker](https://docs.docker.com/get-docker/) is installed on your system.
+- **Docker Compose**: Install [Docker Compose](https://docs.docker.com/compose/install/) to manage multi-container Docker applications.
 
-## Clone the Repository
+## Setup Instructions
 
-Clone the repository to your local machine using the following command:
+1. **Clone the Repository**:
 
-```bash
-git clone https://github.com/imeshSalpage/kafka-docker.git
-```
+   Begin by cloning this repository to your local machine:
 
-Navigate to the cloned directory:
+   ```bash
+   git clone https://github.com/imeshSalpage/kafka-docker.git
+   cd kafka-docker
+   ```
 
-```bash
-cd kafka-docker
-```
+2. **Configure Environment Variables**:
 
-## Configuration
+   Duplicate the sample environment variable file to create an active configuration file:
 
-- **Environment Variables**: The `docker-compose.yml` file in the repository is pre-configured with essential environment variables. Review and modify them if necessary to suit your setup. Key variables include:
-  - `KAFKA_ADVERTISED_HOST_NAME`: Set this to your Docker host's IP address. Avoid using `localhost` or `127.0.0.1` if you plan to run multiple brokers.
-  - `KAFKA_ZOOKEEPER_CONNECT`: Specifies the Zookeeper connection string.
+   ```bash
+   cp tmp.env .env
+   ```
 
-- **Custom Kafka Parameters**: To customize Kafka settings, add the desired parameters as environment variables in the `docker-compose.yml` file. For example, to increase the maximum message size, add:
+   Modify the `.env` file as necessary to suit your environment and preferences.
 
-  ```yaml
-  environment:
-    KAFKA_MESSAGE_MAX_BYTES: 2000000
+3. **Manage the Docker Environment**:
+
+   The provided `Makefile` includes commands to manage the Docker environment:
+
+   - **Start the Services**:
+
+     To build and start the services in detached mode:
+
+     ```bash
+     make up
+     ```
+
+     This command runs `docker compose up --build --remove-orphans -d`, which builds the images and starts the containers in the background.
+
+   - **Start the Services in Foreground**:
+
+     To build and start the services in the foreground:
+
+     ```bash
+     make up-f
+     ```
+
+     This command runs `docker compose up --build --remove-orphans`, which builds the images and starts the containers in the foreground, displaying logs in real-time.
+
+   - **Stop the Services**:
+
+     To stop and remove the running services:
+
+     ```bash
+     make down
+     ```
+
+     This command runs `docker compose down --remove-orphans`, which stops and removes the containers, along with any orphaned containers not defined in the `docker-compose.yml` file.
+
+## Accessing Kafka
+
+Once the services are up, Kafka will be accessible at the address and port specified in your `.env` configuration. Ensure that the `KAFKA_ADVERTISED_HOST_NAME` and other relevant environment variables are correctly set to allow proper connectivity.
+
+## Customization
+
+- **Environment Variables**:
+
+  The `.env` file allows you to customize settings such as Kafka broker configurations, Zookeeper connection strings, and other parameters. Ensure these variables are correctly set up before starting the services.
+
+- **Docker Compose Configuration**:
+
+  The `docker-compose.yml` file defines the services, networks, and volumes. Modify this file if you need to change the default setup, such as adding more brokers or altering service configurations.
+
+## Troubleshooting
+
+- **Logs**:
+
+  To view the logs for the running services, use:
+
+  ```bash
+  docker compose logs
   ```
 
-- **Log4j Configuration**: Customize Kafka's logging by adding environment variables prefixed with `LOG4J_`. For instance, to set the authorizer logger to DEBUG level:
+- **Shell Access**:
 
-  ```yaml
-  environment:
-    LOG4J_LOGGER_KAFKA_AUTHORIZER_LOGGER: DEBUG, authorizerAppender
+  To access the shell inside the Kafka container:
+
+  ```bash
+  docker exec -it kafka-docker_kafka_1 bash
   ```
 
-## Temporary Environment Setup
+  Replace `kafka-docker_kafka_1` with the actual container name if it differs.
 
-If a `.tmp.env` file is provided, rename it to `.env` to ensure the environment variables are correctly loaded:
+## Contributing
 
-```bash
-mv .tmp.env .env
-```
+Contributions are welcome! Please fork this repository, make your changes, and submit a pull request.
 
-## Starting the Kafka Environment
+## License
 
-Use Docker Compose to start the Kafka environment:
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-```bash
-docker-compose up -d
-```
+---
 
-This command initializes the services defined in the `docker-compose.yml` file.
-
-## Scaling the Kafka Cluster
-
-To add more brokers to your Kafka cluster, use the following command:
-
-```bash
-docker-compose scale kafka=3
-```
-
-This command scales the number of Kafka broker instances to three.
-
-## Stopping the Kafka Environment
-
-To stop the running Kafka environment, execute:
-
-```bash
-docker-compose stop
-```
-
-## Creating Kafka Topics Automatically
-
-To have Kafka automatically create topics during startup, add the `KAFKA_CREATE_TOPICS` environment variable in the `docker-compose.yml` file. For example:
-
-```yaml
-environment:
-  KAFKA_CREATE_TOPICS: "Topic1:1:3,Topic2:1:1:compact"
-```
-
-In this configuration:
-
-- `Topic1` is created with 1 partition and 3 replicas.
-- `Topic2` is created with 1 partition, 1 replica, and a cleanup policy set to `compact`.
-
-## Additional Resources
-
-For more detailed information and advanced configurations, refer to the original repository from which this setup is derived: [wurstmeister/kafka-docker](https://github.com/wurstmeister/kafka-docker).
-
-By following these steps, you can set up a Kafka environment using Docker, facilitating efficient development and testing workflows.
-
+For more information on using Kafka with Docker, refer to the [official Kafka Docker image documentation](https://hub.docker.com/r/bitnami/kafka/).
